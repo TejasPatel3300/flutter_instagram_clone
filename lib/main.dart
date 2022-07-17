@@ -1,7 +1,29 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'constants/colors.dart';
+import 'ui/login/login_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeFirebase();
   runApp(const MyApp());
+}
+
+Future<void> initializeFirebase() async {
+  if (kIsWeb) {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: 'AIzaSyCpecNn2WMqCsdEmQ0vsn4vK9yTjoioZCU',
+        appId: '1:157840866902:web:506f02add50a273d46c5f7',
+        messagingSenderId: '157840866902',
+        projectId: 'instagram-clone-2cd2f',
+        storageBucket: 'instagram-clone-2cd2f.appspot.com',
+      ),
+    );
+  } else {
+    await Firebase.initializeApp();
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -10,58 +32,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
+      title: 'Instagram Clone',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData.dark()
+          .copyWith(scaffoldBackgroundColor: AppColors.mobileBackGroundColor),
+      // home: const ResponsiveLayout(
+      //   webLayout: WebScreenLayout(),
+      //   mobileLayout: MoblieScreenLayout(),
+      // ),
+      home: const LoginScreen(),
     );
   }
 }
