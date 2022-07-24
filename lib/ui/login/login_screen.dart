@@ -78,9 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _loginButton() {
     return InkWell(
-      onTap: () {
-        print('object');
-      },
+      onTap: () {},
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -92,5 +90,12 @@ class _LoginScreenState extends State<LoginScreen> {
         child: const Text('Log in'),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }
