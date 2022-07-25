@@ -8,7 +8,10 @@ import 'package:instagram_clone/constants/assets.dart';
 import 'package:instagram_clone/constants/colors.dart';
 import 'package:instagram_clone/resources/auth_manager.dart';
 import 'package:instagram_clone/utils/custom_text_input.dart';
+import 'package:instagram_clone/utils/helpers.dart';
 import 'package:instagram_clone/utils/size_config.dart';
+
+import '../../constants/strings.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -23,7 +26,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _userNameController = TextEditingController();
 
+  bool _isLoading = false;
   Uint8List? _profileImage;
+
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
@@ -47,26 +52,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(height: 20),
                 CustomTextInput(
                   textEditingController: _userNameController,
-                  hint: 'Enter your username',
+                  hint: Strings.enterUserName,
                   inputType: TextInputType.text,
                 ),
                 const SizedBox(height: 10),
                 CustomTextInput(
                   textEditingController: _emailController,
-                  hint: 'Enter your email',
+                  hint: Strings.enterEmail,
                   inputType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 10),
                 CustomTextInput(
                   textEditingController: _passwordController,
-                  hint: 'Enter your password',
+                  hint: Strings.enterPassword,
                   inputType: TextInputType.text,
                   obscureText: true,
                 ),
                 const SizedBox(height: 10),
                 CustomTextInput(
                   textEditingController: _bioController,
-                  hint: 'Enter your bio',
+                  hint: Strings.enterBio,
                   inputType: TextInputType.text,
                 ),
                 const SizedBox(height: 24),
@@ -116,18 +121,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Widget _signUpButton() {
     return InkWell(
-      onTap: () async {
-        final res = await AuthManager().signUpUser(
-          email: _emailController.text,
-          password: _passwordController.text,
-          userName: _userNameController.text,
-          bio: _bioController.text,
-          profilePicture: _profileImage,
-        );
-        if (kDebugMode) {
-          print(res);
-        }
-      },
+      onTap: _signUpUser,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -136,20 +130,56 @@ class _SignUpScreenState extends State<SignUpScreen> {
           color: AppColors.blueColor,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         ),
-        child: const Text('Sign up'),
+        child: _isLoading
+            ? const Center(
+                child: SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    color: AppColors.primaryColor,
+                    strokeWidth: 2,
+                  ),
+                ),
+              )
+            : const Text(Strings.signUp),
       ),
     );
   }
 
   Future<void> _selectImage() async {
-    final ImagePicker _picker = ImagePicker();
+    final ImagePicker picker = ImagePicker();
 
-    XFile? _file = await _picker.pickImage(source: ImageSource.gallery);
+    XFile? file = await picker.pickImage(source: ImageSource.gallery);
 
-    if (_file != null) {
-      _profileImage = await _file.readAsBytes();
+    if (file != null) {
+      _profileImage = await file.readAsBytes();
       setState(() {});
     }
+  }
+
+  Future<void> _signUpUser() async {
+    setState(() {
+      _isLoading = true;
+    });
+    final res = await AuthManager().signUpUser(
+      email: _emailController.text,
+      password: _passwordController.text,
+      userName: _userNameController.text,
+      bio: _bioController.text,
+      profilePicture: _profileImage,
+    );
+    if (kDebugMode) {
+      print(res);
+    }
+
+    if (res != Strings.success) {
+      if (mounted) {
+        showSnackBar(context, res);
+      }
+    }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
