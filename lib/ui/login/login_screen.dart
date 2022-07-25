@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:instagram_clone/constants/assets.dart';
 import 'package:instagram_clone/constants/colors.dart';
+import 'package:instagram_clone/resources/auth_manager.dart';
 import 'package:instagram_clone/utils/custom_text_input.dart';
+
+import '../../constants/strings.dart';
+import '../../utils/helpers.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -14,6 +18,9 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  bool _isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,13 +39,13 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 60),
               CustomTextInput(
                 textEditingController: _emailController,
-                hint: 'Enter email',
+                hint: Strings.enterEmail,
                 inputType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 10),
               CustomTextInput(
                 textEditingController: _passwordController,
-                hint: 'Enter password',
+                hint: Strings.enterPassword,
                 inputType: TextInputType.emailAddress,
                 obscureText: true,
               ),
@@ -54,6 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  /// widget to show sign-up option text
   Widget _signUpText() {
     return GestureDetector(
       onTap: () {},
@@ -62,12 +70,12 @@ class _LoginScreenState extends State<LoginScreen> {
         children: const [
           Padding(
             padding: EdgeInsets.symmetric(vertical: 8),
-            child: Text('Don\'t have an account?'),
+            child: Text(Strings.doNotHaveAccount),
           ),
           Padding(
             padding: EdgeInsets.symmetric(vertical: 8),
             child: Text(
-              'Sign up',
+              Strings.login,
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
@@ -76,9 +84,10 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  /// widget for login button
   Widget _loginButton() {
     return InkWell(
-      onTap: () {},
+      onTap: _loginUser,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -87,7 +96,18 @@ class _LoginScreenState extends State<LoginScreen> {
           color: AppColors.blueColor,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         ),
-        child: const Text('Log in'),
+        child: _isLoading
+            ? const Center(
+                child: SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    color: AppColors.primaryColor,
+                    strokeWidth: 2,
+                  ),
+                ),
+              )
+            : const Text(Strings.login),
       ),
     );
   }
@@ -97,5 +117,25 @@ class _LoginScreenState extends State<LoginScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  /// login user
+  Future<void> _loginUser() async {
+    setState(() {
+      _isLoading = true;
+    });
+    final response = await AuthManager().loginUser(
+      email: _emailController.text,
+      password: _passwordController.text,
+    );
+
+    if (response != Strings.success) {
+      if (mounted) {
+        showSnackBar(context, response);
+      }
+    }
+    setState(() {
+      _isLoading = false;
+    });
   }
 }

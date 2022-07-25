@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/ui/sign_up/sign_up_screen.dart';
+import 'constants/constants.dart';
 import 'constants/colors.dart';
 import 'ui/login/login_screen.dart';
 
@@ -34,6 +34,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Instagram Clone',
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark()
           .copyWith(scaffoldBackgroundColor: AppColors.mobileBackGroundColor),
@@ -41,7 +42,7 @@ class MyApp extends StatelessWidget {
       //   webLayout: WebScreenLayout(),
       //   mobileLayout: MoblieScreenLayout(),
       // ),
-      home: const SignUpScreen(),
+      home: const LoginScreen(),
     );
   }
 }
