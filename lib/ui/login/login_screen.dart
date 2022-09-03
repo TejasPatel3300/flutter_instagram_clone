@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:instagram_clone/constants/assets.dart';
-import 'package:instagram_clone/constants/colors.dart';
-import 'package:instagram_clone/resources/auth_manager.dart';
-import 'package:instagram_clone/utils/custom_text_input.dart';
 
+import '../../constants/assets.dart';
+import '../../constants/colors.dart';
 import '../../constants/strings.dart';
+import '../../resources/auth_manager.dart';
+import '../../utils/custom_text_input.dart';
 import '../../utils/helpers.dart';
+import '../responsive/mobile_screen_layout.dart';
+import '../responsive/responsive_layout_screen.dart';
+import '../responsive/web_screen_layout.dart';
+import '../sign_up/sign_up_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -64,7 +68,13 @@ class _LoginScreenState extends State<LoginScreen> {
   /// widget to show sign-up option text
   Widget _signUpText() {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const SignUpScreen(),
+            ));
+      },
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: const [
@@ -75,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Padding(
             padding: EdgeInsets.symmetric(vertical: 8),
             child: Text(
-              Strings.login,
+              Strings.signUp,
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
@@ -133,6 +143,17 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) {
         showSnackBar(context, response);
       }
+    } else {
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const ResponsiveLayout(
+            webLayout: WebScreenLayout(),
+            mobileLayout: MobileScreenLayout(),
+          ),
+        ),
+      );
     }
     setState(() {
       _isLoading = false;

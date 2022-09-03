@@ -12,6 +12,9 @@ import 'package:instagram_clone/utils/helpers.dart';
 import 'package:instagram_clone/utils/size_config.dart';
 
 import '../../constants/strings.dart';
+import '../responsive/mobile_screen_layout.dart';
+import '../responsive/responsive_layout_screen.dart';
+import '../responsive/web_screen_layout.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -175,6 +178,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
     if (res != Strings.success) {
       if (mounted) {
         showSnackBar(context, res);
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const ResponsiveLayout(
+              webLayout: WebScreenLayout(),
+              mobileLayout: MobileScreenLayout(),
+            ),
+          ),
+        );
       }
     }
     setState(() {
