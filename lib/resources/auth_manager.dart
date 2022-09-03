@@ -1,12 +1,10 @@
-import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import '../data/network/constants.dart';
-import 'storage_manager.dart';
 
+import 'package:instagram_clone/model/user.dart' as user_model;
 import '../constants/strings.dart';
+import 'storage_manager.dart';
 
 class AuthManager {
   AuthManager._internal();
@@ -18,7 +16,15 @@ class AuthManager {
   }
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
+
+  Future<user_model.User> getUserDetail() async {
+    final currentUser = _auth.currentUser;
+
+    DocumentSnapshot snap =
+        await _fireStore.collection('users').doc(currentUser!.uid).get();
+    return user_model.User.fromSnapshot(snap);
+  }
 
   Future<String> signUpUser({
     required String email,
@@ -52,17 +58,20 @@ class AuthManager {
         }
 
         // add user to firestore db
-        final data = {
-          FirebaseParameters.email: email,
-          FirebaseParameters.username: userName,
-          FirebaseParameters.bio: bio,
-          FirebaseParameters.uid: cred.user!.uid,
-          FirebaseParameters.followers: [],
-          FirebaseParameters.following: [],
-          FirebaseParameters.photoUrl: photoUrl,
-        };
+        final user_model.User user = user_model.User(
+          email: email,
+          username: userName,
+          bio: bio,
+          uid: cred.user!.uid,
+          photoUrl: photoUrl ?? '',
+          followers: [],
+          following: [],
+        );
 
-        await _firestore.collection('users').doc(cred.user!.uid).set(data);
+        await _fireStore
+            .collection('users')
+            .doc(cred.user!.uid)
+            .set(user.toJson());
         response = Strings.success;
       }
       response = Strings.failure;
@@ -82,7 +91,7 @@ class AuthManager {
         await _auth.signInWithEmailAndPassword(
             email: email, password: password);
         response = Strings.success;
-      }else{
+      } else {
         response = Strings.enterAllFields;
       }
     } catch (e) {
