@@ -11,4 +11,5 @@ class Strings{
   static const String enterUserName = 'Enter your username';
   static const String doNotHaveAccount = 'Don\'t have an account?';
   static const String enterAllFields =  'Please enter all fields';
+  static const String addPost =  'Add Post';
 }
