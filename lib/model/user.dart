@@ -31,7 +31,10 @@ class User {
         FirebaseParameters.photoUrl: photoUrl,
       };
 
-  static User fromSnapshot(DocumentSnapshot snapshot) {
+  static User? fromSnapshot(DocumentSnapshot snapshot) {
+    if (snapshot.data() == null) {
+      return null;
+    }
     final data = snapshot.data() as Map<String, dynamic>;
 
     return User(

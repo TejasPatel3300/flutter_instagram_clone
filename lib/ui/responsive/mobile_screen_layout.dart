@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/constants/colors.dart';
 import 'package:instagram_clone/ui/add_post/add_post_screen.dart';
+import 'package:instagram_clone/ui/feeds/feeds_screen.dart';
 
 class MobileScreenLayout extends StatefulWidget {
   const MobileScreenLayout({Key? key}) : super(key: key);
@@ -29,7 +30,7 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
           });
         },
         children: const [
-          Center(child:Text('home')),
+          FeedsScreen(),
           Center(child:Text('search')),
           AddPostScreen(),
           Center(child:Text('follow')),
