@@ -18,11 +18,11 @@ class AuthManager {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
 
-  Future<user_model.User> getUserDetail() async {
-    final currentUser = _auth.currentUser;
+  Future<user_model.User?> getUserDetail() async {
+    final currentUser = _auth.currentUser!;
 
     DocumentSnapshot snap =
-        await _fireStore.collection('users').doc(currentUser!.uid).get();
+        await _fireStore.collection('users').doc(currentUser.uid).get();
     return user_model.User.fromSnapshot(snap);
   }
 

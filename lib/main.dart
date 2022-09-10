@@ -49,10 +49,6 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData.dark()
             .copyWith(scaffoldBackgroundColor: AppColors.mobileBackGroundColor),
-        // home: const ResponsiveLayout(
-        //   webLayout: WebScreenLayout(),
-        //   mobileLayout: MoblieScreenLayout(),
-        // ),
         home: StreamBuilder(
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot) {
