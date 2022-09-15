@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/data/network/constants.dart';
 import 'package:instagram_clone/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -22,11 +23,11 @@ Future<void> initializeFirebase() async {
   if (kIsWeb) {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
-        apiKey: 'AIzaSyCpecNn2WMqCsdEmQ0vsn4vK9yTjoioZCU',
-        appId: '1:157840866902:web:506f02add50a273d46c5f7',
-        messagingSenderId: '157840866902',
-        projectId: 'instagram-clone-2cd2f',
-        storageBucket: 'instagram-clone-2cd2f.appspot.com',
+        apiKey: Constants.apiKey,
+        appId: Constants.appId,
+        messagingSenderId: Constants.messengerId,
+        projectId: Constants.projectId,
+        storageBucket: Constants.storageBucket,
       ),
     );
   } else {
