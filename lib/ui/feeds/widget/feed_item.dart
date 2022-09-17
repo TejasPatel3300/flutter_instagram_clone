@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/constants/colors.dart';
 import 'package:instagram_clone/data/network/constants.dart';
@@ -14,15 +15,64 @@ class FeedItem extends StatelessWidget {
     final snapData = doc.data();
     return Column(
       children: [
-        _feedHeader(context,snapData),
-        _content(context,snapData),
-        _feedItemActions(snapData),
-        _description(context,snapData),
+        _FeedHeader(snapData: snapData),
+        _FeedContent(snapData: snapData),
+        _FeedActions(snapData: snapData),
+        _FeedDescription(snapData: snapData),
       ],
     );
   }
+}
 
-  Widget _feedHeader(BuildContext context, Map<String, dynamic> snapData) {
+class _FeedActions extends StatelessWidget {
+  const _FeedActions({
+    Key? key,
+    required this.snapData,
+  }) : super(key: key);
+  final Map<String, dynamic> snapData;
+
+  @override
+  Widget build(BuildContext context) {
+    if (kDebugMode) {
+      print('build feed-action-buttons');
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        vertical: 4,
+        horizontal: 16,
+      ).copyWith(right: 0),
+      child: Row(
+        children: [
+          LikeAnimation(
+            isSmallLike: true,
+            onEnd: () {},
+            child: const Icon(Icons.favorite_border),
+          ),
+          IconButton(
+              onPressed: () {}, icon: const Icon(Icons.chat_bubble_outline)),
+          IconButton(onPressed: () {}, icon: const Icon(Icons.send)),
+          const Expanded(child: SizedBox()),
+          IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.bookmark_border_outlined)),
+        ],
+      ),
+    );
+  }
+}
+
+class _FeedHeader extends StatelessWidget {
+  const _FeedHeader({
+    Key? key,
+    required this.snapData,
+  }) : super(key: key);
+  final Map<String, dynamic> snapData;
+
+  @override
+  Widget build(BuildContext context) {
+    if (kDebugMode) {
+      print('build feed-header');
+    }
     return Container(
       padding: const EdgeInsets.symmetric(
         vertical: 4,
@@ -32,7 +82,8 @@ class FeedItem extends StatelessWidget {
         children: [
           CircleAvatar(
               radius: 16,
-              backgroundImage: NetworkImage(snapData[FirebaseParameters.profImage])),
+              backgroundImage:
+                  NetworkImage(snapData[FirebaseParameters.profImage])),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -68,12 +119,26 @@ class FeedItem extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _content(BuildContext context, Map<String, dynamic> snapData) {
+class _FeedContent extends StatelessWidget {
+  const _FeedContent({
+    Key? key,
+    required this.snapData,
+  }) : super(key: key);
+  final Map<String, dynamic> snapData;
+
+  @override
+  Widget build(BuildContext context) {
+    if (kDebugMode) {
+      print('build feed-content');
+    }
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.4,
       width: double.infinity,
       child: LikeAnimation(
+        isSmallLike: false,
+        onEnd: () {},
         child: Image.network(
           snapData[FirebaseParameters.postUrl],
           fit: BoxFit.cover,
@@ -81,31 +146,19 @@ class FeedItem extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _feedItemActions(Map<String, dynamic> snapData) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        vertical: 4,
-        horizontal: 16,
-      ).copyWith(right: 0),
-      child: Row(
-        children: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.favorite_border)),
-          IconButton(
-              onPressed: () {}, icon: const Icon(Icons.chat_bubble_outline)),
-          IconButton(onPressed: () {}, icon: const Icon(Icons.send)),
-          const Expanded(child: SizedBox()),
-          IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.bookmark_border_outlined)),
-        ],
-      ),
-    );
-  }
+class _FeedDescription extends StatelessWidget {
+  const _FeedDescription({Key? key, required this.snapData}) : super(key: key);
+  final Map<String, dynamic> snapData;
 
-  Widget _description(BuildContext context, Map<String, dynamic> snapData) {
+  @override
+  Widget build(BuildContext context) {
+    if (kDebugMode) {
+      print('build feed-description');
+    }
     return Padding(
-      padding: const EdgeInsets.only(left: 16,bottom: 16).copyWith(right: 0),
+      padding: const EdgeInsets.only(left: 16, bottom: 16).copyWith(right: 0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -126,11 +179,11 @@ class FeedItem extends StatelessWidget {
                   style: const TextStyle(color: AppColors.primaryColor),
                   children: [
                     TextSpan(
-                      text:  snapData[FirebaseParameters.username],
+                      text: snapData[FirebaseParameters.username],
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     TextSpan(
-                      text: ' ${ snapData[FirebaseParameters.description]}',
+                      text: ' ${snapData[FirebaseParameters.description]}',
                     )
                   ]),
             ),
@@ -156,14 +209,14 @@ class FeedItem extends StatelessWidget {
     );
   }
 
-  String _getPostDate(String rawDate){
+  String _getPostDate(String rawDate) {
     final now = DateTime.now();
     final postDate = DateTime.parse(rawDate);
     final diff = postDate.difference(now).inDays;
 
-    if(postDate.month == now.month){
+    if (postDate.month == now.month) {
       return '$diff days ago';
-    }else{
+    } else {
       return DateFormat('dd MMM').format(postDate);
     }
   }

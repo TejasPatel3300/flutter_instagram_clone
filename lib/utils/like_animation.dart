@@ -1,9 +1,14 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class LikeAnimation extends StatefulWidget {
-  const LikeAnimation({Key? key, required this.child}) : super(key: key);
+  const LikeAnimation(
+      {Key? key, required this.child, required this.isSmallLike, required this.onEnd})
+      : super(key: key);
 
   final Widget child;
+  final bool isSmallLike;
+  final VoidCallback onEnd;
 
   @override
   State<LikeAnimation> createState() => _LikeAnimationState();
@@ -25,12 +30,26 @@ class _LikeAnimationState extends State<LikeAnimation>
     );
     _scaleAnimation =
         Tween<double>(begin: 1, end: 1.5).animate(_animationController);
+    _animationController.addStatusListener((status) {
+      if (status == AnimationStatus.forward ||
+          status == AnimationStatus.reverse) {
+        _opacity = 1;
+        setState(() {});
+      } else {
+        _opacity = 0;
+        setState(() {});
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    if (kDebugMode) {
+      print('build Like Animation');
+    }
     return GestureDetector(
-      onDoubleTap: _animate,
+      onDoubleTap: !widget.isSmallLike ? _animate : null,
+      onTap: widget.isSmallLike ? _animate : null,
       child: Stack(
         children: [
           widget.child,
@@ -40,7 +59,7 @@ class _LikeAnimationState extends State<LikeAnimation>
             child: Center(
               child: ScaleTransition(
                 scale: _scaleAnimation,
-                child: const Icon(Icons.favorite, size: 100),
+                child: Icon(Icons.favorite, size:  !widget.isSmallLike ?100 : null),
               ),
             ),
           )
@@ -56,20 +75,8 @@ class _LikeAnimationState extends State<LikeAnimation>
   }
 
   Future<void> _animate() async {
-    setState(() {
-      _opacity = 1;
-    });
-    print('animating ${_animationController.status}');
     await _animationController.forward();
-    print('animating ${_animationController.status}');
     await _animationController.reverse();
-    print('animating ${_animationController.status}');
     await Future.delayed(const Duration(milliseconds: 200));
-    setState(() {
-      _opacity = 0;
-    });
-    print('animating ${_animationController.status}');
-
-    // }
   }
 }
