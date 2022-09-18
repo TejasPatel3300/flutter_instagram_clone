@@ -176,7 +176,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
     if (res != Strings.success) {
       if (mounted) {
         showSnackBar(context, res);
-      } else {
+      }
+    }else {
+      if(mounted){
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(

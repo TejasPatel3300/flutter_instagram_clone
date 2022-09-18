@@ -2,13 +2,18 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class LikeAnimation extends StatefulWidget {
-  const LikeAnimation(
-      {Key? key, required this.child, required this.isSmallLike, required this.onEnd})
-      : super(key: key);
+  const LikeAnimation({
+    Key? key,
+    required this.child,
+    required this.isSmallLike,
+    required this.onLiked,
+    this.iconSize,
+  }) : super(key: key);
 
-  final Widget child;
   final bool isSmallLike;
-  final VoidCallback onEnd;
+  final double? iconSize;
+  final Widget child;
+  final VoidCallback onLiked;
 
   @override
   State<LikeAnimation> createState() => _LikeAnimationState();
@@ -59,7 +64,7 @@ class _LikeAnimationState extends State<LikeAnimation>
             child: Center(
               child: ScaleTransition(
                 scale: _scaleAnimation,
-                child: Icon(Icons.favorite, size:  !widget.isSmallLike ?100 : null),
+                child: Icon(Icons.favorite, size: widget.iconSize),
               ),
             ),
           )
@@ -75,6 +80,7 @@ class _LikeAnimationState extends State<LikeAnimation>
   }
 
   Future<void> _animate() async {
+    widget.onLiked();
     await _animationController.forward();
     await _animationController.reverse();
     await Future.delayed(const Duration(milliseconds: 200));

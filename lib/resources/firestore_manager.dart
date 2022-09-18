@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import 'package:instagram_clone/resources/storage_manager.dart';
 import 'package:uuid/uuid.dart';
 
 import '../constants/strings.dart';
+import '../data/network/constants.dart';
 import '../model/post.dart';
+import 'storage_manager.dart';
 
 class FireStoreManager {
   FireStoreManager._internal();
@@ -48,5 +49,62 @@ class FireStoreManager {
       response = e.toString();
     }
     return response;
+  }
+
+  Future<void> likePost({
+    required String postId,
+    required String userId,
+    required List likes,
+  }) async {
+    try {
+      if (likes.contains(userId)) {
+        _fireStore.collection('posts').doc(postId).update(
+          {
+            FirebaseParameters.likes: FieldValue.arrayRemove([userId])
+          },
+        );
+      } else {
+        _fireStore.collection('posts').doc(postId).update(
+          {
+            FirebaseParameters.likes: FieldValue.arrayUnion([userId])
+          },
+        );
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+    }
+  }
+
+  Future<void> postComment({
+    required String postId,
+    required String userId,
+    required String commentText,
+    required String profImage,
+    required String username,
+  }) async {
+    try {
+      if (commentText.isNotEmpty) {
+        final commentId = const Uuid().v1();
+        _fireStore
+            .collection('posts')
+            .doc(postId)
+            .collection('comments')
+            .doc(commentId)
+            .set({
+          FirebaseParameters.profImage: profImage,
+          FirebaseParameters.username: username,
+          FirebaseParameters.postId: postId,
+          FirebaseParameters.description: commentText,
+          FirebaseParameters.uid: userId,
+          FirebaseParameters.datePublished: DateTime.now().toUtc().toString(),
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+    }
   }
 }

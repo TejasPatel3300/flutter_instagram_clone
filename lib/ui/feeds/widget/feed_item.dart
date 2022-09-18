@@ -1,10 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/constants/colors.dart';
-import 'package:instagram_clone/data/network/constants.dart';
-import 'package:instagram_clone/utils/like_animation.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+
+import '../../../constants/colors.dart';
+import '../../../data/network/constants.dart';
+import '../../../model/user.dart';
+import '../../../providers/user_provider.dart';
+import '../../../resources/firestore_manager.dart';
+import '../../../utils/helpers.dart';
+import '../../../utils/like_animation.dart';
+import '../../comments/comments_screen.dart';
 
 class FeedItem extends StatelessWidget {
   const FeedItem({Key? key, required this.doc}) : super(key: key);
@@ -12,13 +18,15 @@ class FeedItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context).user;
     final snapData = doc.data();
+    print(snapData);
     return Column(
       children: [
-        _FeedHeader(snapData: snapData),
-        _FeedContent(snapData: snapData),
-        _FeedActions(snapData: snapData),
-        _FeedDescription(snapData: snapData),
+        _FeedHeader(snapData: snapData, user: user),
+        _FeedContent(snapData: snapData, user: user),
+        _FeedActions(snapData: snapData, user: user),
+        _FeedDescription(snapData: snapData, user: user),
       ],
     );
   }
@@ -28,8 +36,10 @@ class _FeedActions extends StatelessWidget {
   const _FeedActions({
     Key? key,
     required this.snapData,
+    required this.user,
   }) : super(key: key);
   final Map<String, dynamic> snapData;
+  final User? user;
 
   @override
   Widget build(BuildContext context) {
@@ -45,16 +55,38 @@ class _FeedActions extends StatelessWidget {
         children: [
           LikeAnimation(
             isSmallLike: true,
-            onEnd: () {},
-            child: const Icon(Icons.favorite_border),
+            onLiked: () {
+              FireStoreManager().likePost(
+                postId: snapData[FirebaseParameters.postId],
+                userId: user?.uid??'',
+                likes: snapData[FirebaseParameters.likes] as List,
+              );
+            },
+            child: Icon(
+              (snapData[FirebaseParameters.likes] as List).contains(user?.uid??'')
+                  ? Icons.favorite
+                  : Icons.favorite_border,
+            ),
           ),
           IconButton(
-              onPressed: () {}, icon: const Icon(Icons.chat_bubble_outline)),
-          IconButton(onPressed: () {}, icon: const Icon(Icons.send)),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => CommentsScreen(snap: snapData),
+                ),
+              );
+            },
+            icon: const Icon(Icons.chat_bubble_outline),
+          ),
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.send),
+          ),
           const Expanded(child: SizedBox()),
           IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.bookmark_border_outlined)),
+            onPressed: () {},
+            icon: const Icon(Icons.bookmark_border_outlined),
+          ),
         ],
       ),
     );
@@ -65,8 +97,10 @@ class _FeedHeader extends StatelessWidget {
   const _FeedHeader({
     Key? key,
     required this.snapData,
+    required this.user,
   }) : super(key: key);
   final Map<String, dynamic> snapData;
+  final User? user;
 
   @override
   Widget build(BuildContext context) {
@@ -125,8 +159,10 @@ class _FeedContent extends StatelessWidget {
   const _FeedContent({
     Key? key,
     required this.snapData,
+    required this.user,
   }) : super(key: key);
   final Map<String, dynamic> snapData;
+  final User? user;
 
   @override
   Widget build(BuildContext context) {
@@ -138,10 +174,20 @@ class _FeedContent extends StatelessWidget {
       width: double.infinity,
       child: LikeAnimation(
         isSmallLike: false,
-        onEnd: () {},
-        child: Image.network(
-          snapData[FirebaseParameters.postUrl],
-          fit: BoxFit.cover,
+        iconSize: 100,
+        onLiked: () {
+          FireStoreManager().likePost(
+            postId: snapData[FirebaseParameters.postId],
+            userId: user?.uid??'',
+            likes: snapData[FirebaseParameters.likes] as List,
+          );
+        },
+        child: Center(
+          child: Image.network(
+            snapData[FirebaseParameters.postUrl],
+            fit: BoxFit.cover,
+            alignment: Alignment.center,
+          ),
         ),
       ),
     );
@@ -149,8 +195,10 @@ class _FeedContent extends StatelessWidget {
 }
 
 class _FeedDescription extends StatelessWidget {
-  const _FeedDescription({Key? key, required this.snapData}) : super(key: key);
+  const _FeedDescription({Key? key, required this.snapData, required this.user})
+      : super(key: key);
   final Map<String, dynamic> snapData;
+  final User? user;
 
   @override
   Widget build(BuildContext context) {
@@ -190,15 +238,36 @@ class _FeedDescription extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           GestureDetector(
-            onTap: () {},
-            child: const Text(
-              'View all 23 comments',
-              style: TextStyle(fontSize: 16, color: AppColors.secondaryColor),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => CommentsScreen(snap: snapData),
+              ));
+            },
+            child: StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection('posts')
+                  .doc(snapData[FirebaseParameters.postId])
+                  .collection('comments')
+                  .orderBy(FirebaseParameters.datePublished,descending: true)
+                  .snapshots(),
+              builder: (context,AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Text(
+                    'View all comments',
+                    style: TextStyle(fontSize: 16, color: AppColors.secondaryColor),
+                  );
+                }
+                final docs = snapshot.data?.docs ?? [];
+                return Text(
+                  'View all ${docs.length} comments',
+                  style: const TextStyle(fontSize: 16, color: AppColors.secondaryColor),
+                );
+              }
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            _getPostDate(snapData[FirebaseParameters.datePublished]),
+            getPostDate(snapData[FirebaseParameters.datePublished]),
             style: const TextStyle(
               color: AppColors.secondaryColor,
               fontSize: 12,
@@ -207,17 +276,5 @@ class _FeedDescription extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _getPostDate(String rawDate) {
-    final now = DateTime.now();
-    final postDate = DateTime.parse(rawDate);
-    final diff = postDate.difference(now).inDays;
-
-    if (postDate.month == now.month) {
-      return '$diff days ago';
-    } else {
-      return DateFormat('dd MMM').format(postDate);
-    }
   }
 }
