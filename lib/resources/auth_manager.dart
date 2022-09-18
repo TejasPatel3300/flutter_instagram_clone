@@ -74,7 +74,6 @@ class AuthManager {
             .set(user.toJson());
         response = Strings.success;
       }
-      response = Strings.failure;
     } catch (e) {
       response = e.toString();
     }

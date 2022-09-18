@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:instagram_clone/constants/assets.dart';
@@ -13,12 +14,28 @@ class FeedsScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppColors.mobileBackGroundColor,
         centerTitle: false,
-        title: SvgPicture.asset(Assets.logo,color: Colors.white,height: 40),
+        title: SvgPicture.asset(Assets.logo, color: Colors.white, height: 40),
         actions: [
-          IconButton(onPressed: (){}, icon:const Icon(Icons.messenger_outline))
+          IconButton(
+              onPressed: () {}, icon: const Icon(Icons.messenger_outline))
         ],
       ),
-      body: FeedItem(),
+      body: StreamBuilder(
+        stream: FirebaseFirestore.instance.collection('posts').snapshots(),
+        builder: (context,
+            AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          final docs = snapshot.data?.docs ?? [];
+          return ListView.builder(
+            itemCount: docs.length,
+            itemBuilder: (context, index) => FeedItem(
+              doc: docs[index]
+            ),
+          );
+        },
+      ),
     );
   }
 }

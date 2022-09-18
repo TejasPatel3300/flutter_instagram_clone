@@ -15,3 +15,11 @@ class FirebaseParameters{
   static const String profImage = 'profImage';
   static const String description = 'description';
 }
+
+class Constants{
+  static const String appId = '1:157840866902:web:506f02add50a273d46c5f7';
+  static const String apiKey = 'AIzaSyCpecNn2WMqCsdEmQ0vsn4vK9yTjoioZCU';
+  static const String messengerId = '157840866902';
+  static const String projectId = 'instagram-clone-2cd2f';
+  static const String storageBucket = 'instagram-clone-2cd2f.appspot.com';
+}

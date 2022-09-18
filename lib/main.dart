@@ -2,11 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'constants/colors.dart';
 import 'constants/constants.dart';
+import 'data/network/constants.dart';
+import 'providers/user_provider.dart';
 import 'ui/login/login_screen.dart';
 import 'ui/responsive/mobile_screen_layout.dart';
 import 'ui/responsive/responsive_layout_screen.dart';
@@ -22,11 +23,11 @@ Future<void> initializeFirebase() async {
   if (kIsWeb) {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
-        apiKey: 'AIzaSyCpecNn2WMqCsdEmQ0vsn4vK9yTjoioZCU',
-        appId: '1:157840866902:web:506f02add50a273d46c5f7',
-        messagingSenderId: '157840866902',
-        projectId: 'instagram-clone-2cd2f',
-        storageBucket: 'instagram-clone-2cd2f.appspot.com',
+        apiKey: Constants.apiKey,
+        appId: Constants.appId,
+        messagingSenderId: Constants.messengerId,
+        projectId: Constants.projectId,
+        storageBucket: Constants.storageBucket,
       ),
     );
   } else {

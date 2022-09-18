@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -178,7 +176,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
     if (res != Strings.success) {
       if (mounted) {
         showSnackBar(context, res);
-      } else {
+      }
+    }else {
+      if(mounted){
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(

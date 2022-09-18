@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:instagram_clone/constants/colors.dart';
-import 'package:instagram_clone/model/user.dart';
-import 'package:instagram_clone/providers/user_provider.dart';
-import 'package:instagram_clone/resources/firestore_manager.dart';
-import 'package:instagram_clone/utils/helpers.dart';
-import 'package:instagram_clone/utils/size_config.dart';
 import 'package:provider/provider.dart';
 
+import '../../constants/colors.dart';
 import '../../constants/strings.dart';
+import '../../model/user.dart';
+import '../../providers/user_provider.dart';
+import '../../resources/firestore_manager.dart';
+import '../../utils/helpers.dart';
+import '../../utils/size_config.dart';
 
 class AddPostScreen extends StatefulWidget {
   const AddPostScreen({Key? key}) : super(key: key);
@@ -47,7 +47,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CircleAvatar(backgroundImage: NetworkImage(user.photoUrl)),
+                    CircleAvatar(backgroundImage: NetworkImage(user?.photoUrl??'')),
                     SizedBox(
                       width: SizeConfig.screenWidth * 0.45,
                       child: TextField(
@@ -82,7 +82,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
           );
   }
 
-  AppBar _appBar(User user) {
+  AppBar _appBar(User? user) {
     return AppBar(
       backgroundColor: AppColors.mobileBackGroundColor,
       leading: IconButton(
@@ -94,9 +94,9 @@ class _AddPostScreenState extends State<AddPostScreen> {
         TextButton(
           onPressed: () => _postImage(
             description: _descriptionController.text,
-            uid: user.uid,
-            username: user.username,
-            profImage: user.photoUrl,
+            uid: user?.uid ?? '',
+            username: user?.username??'',
+            profImage: user?.photoUrl??'',
           ),
           child: const Text(
             'post',
