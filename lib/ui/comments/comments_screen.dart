@@ -108,6 +108,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
         profImage: widget.snap[FirebaseParameters.profImage],
         username: user?.username ?? '',
       );
+      _commentsController.clear();
     }
   }
 }

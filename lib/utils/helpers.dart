@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-void showSnackBar(BuildContext context, String content){
+void showSnackBar(BuildContext context, String content) {
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(content)));
 }
 
 String getPostDate(String rawDate) {
   final now = DateTime.now();
   final postDate = DateTime.parse(rawDate);
-  final diff = postDate.difference(now).inDays;
+  final diff = now.difference(postDate).inDays;
 
   if (postDate.month == now.month) {
     return '$diff days ago';
@@ -20,12 +20,10 @@ String getPostDate(String rawDate) {
 String getCommentDate(String rawDate) {
   final now = DateTime.now();
   final postDate = DateTime.parse(rawDate);
-  final diff = postDate.difference(now).inDays;
+  final diff = now.difference(postDate).inDays;
 
-  if(diff >= 7){
-    return '${diff ~/7} w';
+  if (diff >= 7) {
+    return '${diff ~/ 7} w';
   }
   return '$diff d';
-
-
 }
