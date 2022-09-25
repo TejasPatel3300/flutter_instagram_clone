@@ -1,9 +1,11 @@
-import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:instagram_clone/resources/storage_manager.dart';
+
+import '../constants/strings.dart';
+import '../data/network/constants.dart';
+import '../model/user.dart' as user_model;
+import 'storage_manager.dart';
 
 class AuthManager {
   AuthManager._internal();
@@ -15,7 +17,15 @@ class AuthManager {
   }
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
+
+  Future<user_model.User?> getUserDetail() async {
+    final currentUser = _auth.currentUser!;
+
+    DocumentSnapshot snap =
+        await _fireStore.collection(FirebaseParameters.collectionUsers).doc(currentUser.uid).get();
+    return user_model.User.fromSnapshot(snap);
+  }
 
   Future<String> signUpUser({
     required String email,
@@ -24,6 +34,7 @@ class AuthManager {
     required String bio,
     Uint8List? profilePicture,
   }) async {
+    String response = Strings.failure;
     try {
       String? photoUrl;
       if (email.isNotEmpty &&
@@ -48,22 +59,44 @@ class AuthManager {
         }
 
         // add user to firestore db
-        final data = {
-          'email': email,
-          'username': userName,
-          'bio': bio,
-          'uid': cred.user!.uid,
-          'followers': [],
-          'following': [],
-          'photoUrl': photoUrl,
-        };
+        final user_model.User user = user_model.User(
+          email: email,
+          username: userName,
+          bio: bio,
+          uid: cred.user!.uid,
+          photoUrl: photoUrl ?? '',
+          followers: [],
+          following: [],
+        );
 
-        await _firestore.collection('users').doc(cred.user!.uid).set(data);
-        return "success";
+        await _fireStore
+            .collection(FirebaseParameters.collectionUsers)
+            .doc(cred.user!.uid)
+            .set(user.toJson());
+        response = Strings.success;
       }
-      return "failure";
     } catch (e) {
-      return e.toString();
+      response = e.toString();
     }
+    return response;
+  }
+
+  Future<String> loginUser({
+    required String email,
+    required String password,
+  }) async {
+    String response = Strings.failure;
+    try {
+      if (email.isNotEmpty && password.isNotEmpty) {
+        await _auth.signInWithEmailAndPassword(
+            email: email, password: password);
+        response = Strings.success;
+      } else {
+        response = Strings.enterAllFields;
+      }
+    } catch (e) {
+      response = e.toString();
+    }
+    return response;
   }
 }
