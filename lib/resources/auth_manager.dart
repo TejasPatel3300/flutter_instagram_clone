@@ -2,8 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
-import 'package:instagram_clone/model/user.dart' as user_model;
 import '../constants/strings.dart';
+import '../data/network/constants.dart';
+import '../model/user.dart' as user_model;
 import 'storage_manager.dart';
 
 class AuthManager {
@@ -22,7 +23,7 @@ class AuthManager {
     final currentUser = _auth.currentUser!;
 
     DocumentSnapshot snap =
-        await _fireStore.collection('users').doc(currentUser.uid).get();
+        await _fireStore.collection(FirebaseParameters.collectionUsers).doc(currentUser.uid).get();
     return user_model.User.fromSnapshot(snap);
   }
 
@@ -69,7 +70,7 @@ class AuthManager {
         );
 
         await _fireStore
-            .collection('users')
+            .collection(FirebaseParameters.collectionUsers)
             .doc(cred.user!.uid)
             .set(user.toJson());
         response = Strings.success;

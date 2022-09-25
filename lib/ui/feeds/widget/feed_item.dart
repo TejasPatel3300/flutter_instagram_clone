@@ -245,9 +245,9 @@ class _FeedDescription extends StatelessWidget {
             },
             child: StreamBuilder(
               stream: FirebaseFirestore.instance
-                  .collection('posts')
+                  .collection(FirebaseParameters.collectionPosts)
                   .doc(snapData[FirebaseParameters.postId])
-                  .collection('comments')
+                  .collection(FirebaseParameters.collectionComments)
                   .orderBy(FirebaseParameters.datePublished,descending: true)
                   .snapshots(),
               builder: (context,AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {

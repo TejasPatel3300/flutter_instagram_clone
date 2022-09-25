@@ -170,6 +170,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
         file: _image!,
         profImage: profImage,
       );
+      _descriptionController.clear();
       setState(() {
         _isLoading = false;
       });

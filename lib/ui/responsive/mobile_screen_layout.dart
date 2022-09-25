@@ -1,8 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram_clone/constants/colors.dart';
-import 'package:instagram_clone/ui/add_post/add_post_screen.dart';
-import 'package:instagram_clone/ui/feeds/feeds_screen.dart';
+import 'package:provider/provider.dart';
+
+import '../../constants/colors.dart';
+import '../../providers/user_provider.dart';
+import '../add_post/add_post_screen.dart';
+import '../feeds/feeds_screen.dart';
+import '../profile/profile_screen.dart';
+import '../search/search_screen.dart';
 
 class MobileScreenLayout extends StatefulWidget {
   const MobileScreenLayout({Key? key}) : super(key: key);
@@ -29,12 +34,12 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
             _pageIndex = value;
           });
         },
-        children: const [
+        children: [
           FeedsScreen(),
-          Center(child:Text('search')),
+          SearchScreen(),
           AddPostScreen(),
           Center(child:Text('follow')),
-          Center(child:Text('profile')),
+          ProfileScreen(uid: context.read<UserProvider>().user?.uid??''),
         ],
       ),
     );

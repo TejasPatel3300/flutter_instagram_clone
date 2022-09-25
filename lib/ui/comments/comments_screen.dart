@@ -76,9 +76,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: StreamBuilder(
           stream: FirebaseFirestore.instance
-              .collection('posts')
+              .collection(FirebaseParameters.collectionPosts)
               .doc(widget.snap[FirebaseParameters.postId])
-              .collection('comments')
+              .collection(FirebaseParameters.collectionComments)
               .orderBy(FirebaseParameters.datePublished, descending: true)
               .snapshots(),
           builder: (context,

@@ -27,8 +27,10 @@ class FireStoreManager {
   }) async {
     String response = Strings.failure;
     try {
-      final downloadUrl = await StorageManager()
-          .uploadImageToStorage(childName: 'posts', file: file, isPost: true);
+      final downloadUrl = await StorageManager().uploadImageToStorage(
+          childName: FirebaseParameters.collectionPosts,
+          file: file,
+          isPost: true);
 
       final postId = const Uuid().v1();
 
@@ -43,7 +45,10 @@ class FireStoreManager {
         likes: [],
       );
 
-      _fireStore.collection('posts').doc(postId).set(post.toJson());
+      _fireStore
+          .collection(FirebaseParameters.collectionPosts)
+          .doc(postId)
+          .set(post.toJson());
       response = Strings.success;
     } catch (e) {
       response = e.toString();
@@ -58,13 +63,19 @@ class FireStoreManager {
   }) async {
     try {
       if (likes.contains(userId)) {
-        _fireStore.collection('posts').doc(postId).update(
+        _fireStore
+            .collection(FirebaseParameters.collectionPosts)
+            .doc(postId)
+            .update(
           {
             FirebaseParameters.likes: FieldValue.arrayRemove([userId])
           },
         );
       } else {
-        _fireStore.collection('posts').doc(postId).update(
+        _fireStore
+            .collection(FirebaseParameters.collectionPosts)
+            .doc(postId)
+            .update(
           {
             FirebaseParameters.likes: FieldValue.arrayUnion([userId])
           },
@@ -88,9 +99,9 @@ class FireStoreManager {
       if (commentText.isNotEmpty) {
         final commentId = const Uuid().v1();
         _fireStore
-            .collection('posts')
+            .collection(FirebaseParameters.collectionPosts)
             .doc(postId)
-            .collection('comments')
+            .collection(FirebaseParameters.collectionComments)
             .doc(commentId)
             .set({
           FirebaseParameters.profImage: profImage,
@@ -99,6 +110,43 @@ class FireStoreManager {
           FirebaseParameters.description: commentText,
           FirebaseParameters.uid: userId,
           FirebaseParameters.datePublished: DateTime.now().toUtc().toString(),
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+    }
+  }
+
+  Future<void> followUser(
+      {required String uid, required String followId}) async {
+    try {
+      final userDocSnap = await _fireStore
+          .collection(FirebaseParameters.collectionUsers)
+          .doc(uid)
+          .get();
+      final followingList = (userDocSnap.data()?[FirebaseParameters.following] as List);
+      final isFollowing =  followingList.contains(followId);
+      if(isFollowing){
+        await _fireStore.collection(FirebaseParameters.collectionUsers)
+            .doc(followId).update({
+          FirebaseParameters.followers: FieldValue.arrayRemove([uid])
+        });
+
+        await _fireStore.collection(FirebaseParameters.collectionUsers)
+            .doc(uid).update({
+          FirebaseParameters.following: FieldValue.arrayRemove([followId])
+        });
+      }else{
+        await _fireStore.collection(FirebaseParameters.collectionUsers)
+            .doc(followId).update({
+          FirebaseParameters.followers: FieldValue.arrayUnion([uid])
+        });
+
+        await _fireStore.collection(FirebaseParameters.collectionUsers)
+            .doc(uid).update({
+          FirebaseParameters.following: FieldValue.arrayUnion([followId])
         });
       }
     } catch (e) {
