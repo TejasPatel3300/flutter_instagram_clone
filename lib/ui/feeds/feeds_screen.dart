@@ -5,6 +5,8 @@ import 'package:instagram_clone/constants/assets.dart';
 import 'package:instagram_clone/constants/colors.dart';
 import 'package:instagram_clone/ui/feeds/widget/feed_item.dart';
 
+import '../../data/network/constants.dart';
+
 class FeedsScreen extends StatelessWidget {
   const FeedsScreen({Key? key}) : super(key: key);
 
@@ -21,7 +23,7 @@ class FeedsScreen extends StatelessWidget {
         ],
       ),
       body: StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('posts').snapshots(),
+        stream: FirebaseFirestore.instance.collection(FirebaseParameters.collectionPosts).snapshots(),
         builder: (context,
             AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

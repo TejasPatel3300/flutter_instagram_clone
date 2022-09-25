@@ -1,6 +1,10 @@
 class FirebaseParameters{
   FirebaseParameters._internal();
 
+  static const String collectionUsers = 'users';
+  static const String collectionPosts = 'posts';
+  static const String collectionComments = 'comments';
+
   static const String email = 'email';
   static const String username = 'username';
   static const String bio = 'bio';
